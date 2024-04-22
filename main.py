@@ -7,12 +7,12 @@ from pygame.sprite import Sprite, Group
 
 FPS = 60
 BLANK = None
-
+ 
 # constants
 UP = 'up'
 DOWN = 'down'
 LEFT = 'left'
-RIGHT = 'right'
+RIGHT = 'left'
 
 # global variable to be used in multiple functions, default value is None
 FPS_CLOCK = None
@@ -118,7 +118,7 @@ def main():
 
         main_game.projectile_group.update() 
         main_game.projectile_group.draw(DISPLAY_SURFACE)
-        
+
         pygame.display.update()
         FPS_CLOCK.tick(FPS)
 
