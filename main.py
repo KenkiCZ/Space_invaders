@@ -115,10 +115,10 @@ def main():
         DISPLAY_SURFACE.blit(spaceship.image, spaceship.rect)
         invader_sprite_group.draw(DISPLAY_SURFACE)
 
-        # Update and draw projectiles
-        main_game.projectile_group.update()  # Update projectile positions
-        main_game.projectile_group.draw(DISPLAY_SURFACE)  # Draw projectiles
 
+        main_game.projectile_group.update() 
+        main_game.projectile_group.draw(DISPLAY_SURFACE)
+        
         pygame.display.update()
         FPS_CLOCK.tick(FPS)
 
