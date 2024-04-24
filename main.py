@@ -133,6 +133,7 @@ def spaceship_collision(game: Game):
         game.spaceship.health -= 1
         if game.spaceship.health == 0:
             print(game.spaceship.health)
+            """ -- -- -- -- Place for an end of the game -- -- -- -- """
             game.game_active = False
 
 
