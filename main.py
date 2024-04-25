@@ -49,12 +49,13 @@ class Game:
 
 
 # Class for SpaceShip
+
 class SpaceShip(pygame.sprite.Sprite):  # Here we are inheriting from the pygame.sprite.Sprite class
     def __init__(self):
         super().__init__()
         # The order of self.image: load image -> resize image -> rotate image
         self.image = pygame.transform.rotate(pygame.transform.scale(pygame.image.load(SPACESHIP_IMG).convert_alpha(), (
-        int(WINDOW_WIDTH * 0.18), int(WINDOW_WIDTH * 0.18))), 180.0)
+        int(WINDOW_WIDTH * 0.15), int(WINDOW_WIDTH * 0.15))), 180.0)
         # The order of self.rect: get rect from image -> set rect position
         self.rect = self.image.get_rect(midbottom=(WINDOW_WIDTH / 2, WINDOW_HEIGHT - 75))
         self.health = 3
@@ -74,7 +75,7 @@ class Invader(pygame.sprite.Sprite):
     def update(self, game: Game):
         if random.randint(0, 1000) == 1:
             # Create a projectile
-            shoot_projectile(game=game, position=(self.x, self.y), direction=1, speed=5)
+            shoot_projectile(game=game, position=(self.x, self.y), direction=1, speed=4)
 
 
 # Class for Projectile
@@ -138,7 +139,7 @@ def spaceship_collision(game: Game):
             """ -- -- -- -- Place for an end of the game -- -- -- -- """
             game.game_active = False
 
-def title_screen_animation():
+def title_screen_animation(game: Game):
     invader_sprite_group = pygame.sprite.Group()
     for _ in range(10):
         invader = Invader(random.randint(0, WINDOW_WIDTH), random.randint(0, WINDOW_HEIGHT))
@@ -161,7 +162,7 @@ def title_screen_animation():
                 pygame.quit()
 
         load_background(DISPLAY_SURFACE=DISPLAY_SURFACE)
-        invader_sprite_group.update()
+        invader_sprite_group.update(game)
         invader_sprite_group.draw(DISPLAY_SURFACE)
 
         for invader in invader_sprite_group:
@@ -192,7 +193,7 @@ def main():
 
     BASIC_FONT = pygame.font.Font('freesansbold.ttf', BASIC_FONT_SIZE)
 
-    title_screen_animation()
+
     
     spaceship = SpaceShip()
     invaders_list = [Invader(x_pos=x * 85, y_pos=y * 60) for x in range(1, 7) for y in range(1, 4)]
@@ -203,6 +204,7 @@ def main():
     # Create the game object
     main_game = Game(Invader_group=invader_sprite_group, SpaceShip=spaceship, Projectile_group_inv=Group(),
                      Projectile_group_spa=Group())
+    title_screen_animation(game=main_game)
 
     while True:
         for event in pygame.event.get():
