@@ -6,6 +6,8 @@ from pygame.sprite import Sprite, Group
 FPS = 60
 BLANK = None
 
+pygame.display.set_caption("Space Invaders")
+
 # constants
 UP = 'up'
 DOWN = 'down'
@@ -136,6 +138,49 @@ def spaceship_collision(game: Game):
             """ -- -- -- -- Place for an end of the game -- -- -- -- """
             game.game_active = False
 
+def title_screen_animation():
+    invader_sprite_group = pygame.sprite.Group()
+    for _ in range(10):
+        invader = Invader(random.randint(0, WINDOW_WIDTH), random.randint(0, WINDOW_HEIGHT))
+        invader_sprite_group.add(invader)
+
+    font = pygame.font.Font(FONT_PATH, BASIC_FONT_SIZE)
+    game_title=font.render("Space Invaders",True,(255,255,255))
+    start_text=font.render("Press SPACE to Start",True,(255,255,255))
+
+    highlighted_surface_title = pygame.Surface((game_title.get_width(), game_title.get_height()))
+    highlighted_surface_title.fill((0, 0, 0))
+    highlighted_surface_start = pygame.Surface((start_text.get_width(), start_text.get_height()))
+    highlighted_surface_start.fill((0, 0, 0))
+
+    while True:
+        for event in pygame.event.get():
+            if event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE:
+                return
+            if event.type == pygame.QUIT:
+                pygame.quit()
+
+        load_background(DISPLAY_SURFACE=DISPLAY_SURFACE)
+        invader_sprite_group.update()
+        invader_sprite_group.draw(DISPLAY_SURFACE)
+
+        for invader in invader_sprite_group:
+            invader.rect.x += 1
+            if invader.rect.left > WINDOW_WIDTH:
+                invader.rect.right = 0
+            """invader.rect.x += random.randint(-1, 1)
+            invader.rect.y += random.randint(-1, 1)
+            invader.rect.x = max(0, min(invader.rect.x, WINDOW_WIDTH - invader.rect.width))
+            invader.rect.y = max(0, min(invader.rect.y, WINDOW_HEIGHT - invader.rect.height))"""
+
+        DISPLAY_SURFACE.blit(highlighted_surface_title, (WINDOW_WIDTH // 2 - game_title.get_width() // 2, 200))
+        DISPLAY_SURFACE.blit(game_title, (WINDOW_WIDTH // 2 - game_title.get_width() // 2, 200))
+        
+        DISPLAY_SURFACE.blit(highlighted_surface_start, (WINDOW_WIDTH // 2 - start_text.get_width() // 2, 300))
+        DISPLAY_SURFACE.blit(start_text, (WINDOW_WIDTH // 2 - start_text.get_width() // 2, 300))
+
+        pygame.display.update()
+        FPS_CLOCK.tick(FPS)
 
 def main():
     global FPS_CLOCK, DISPLAY_SURFACE, BASIC_FONT, BUTTONS, BLANK
@@ -147,6 +192,8 @@ def main():
 
     BASIC_FONT = pygame.font.Font('freesansbold.ttf', BASIC_FONT_SIZE)
 
+    title_screen_animation()
+    
     spaceship = SpaceShip()
     invaders_list = [Invader(x_pos=x * 85, y_pos=y * 60) for x in range(1, 7) for y in range(1, 4)]
     invader_sprite_group = Group()
