@@ -247,7 +247,7 @@ def main():
         main_game.update(DISPLAY_SURFACE=DISPLAY_SURFACE)  # Update projectile positions
         
         if not main_game.game_active:
-            display_win_screen(DISPLAY_SURFACE)
+            display_win_screen()
 
             for event in pygame.event.get():
                 if event.type == pygame.KEYDOWN:
