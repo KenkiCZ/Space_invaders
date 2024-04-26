@@ -33,12 +33,21 @@ class Game:
         self.game_active = True
 
     def update(self, DISPLAY_SURFACE):
+        self.projectile_invader_collision()
+        
         for invader in self.invader_group:
             invader.update(self)
 
         self.projectile_movement()
         spaceship_collision(self)
-
+        
+    def projectile_invader_collision(self):
+        collisions = pygame.sprite.groupcollide(self.projectile_group_spaceship, self.invader_group, True, True)
+        
+        for invader_list in collisions.values():
+            for invader in invader_list:
+                invader.kill()
+                
     def projectile_movement(self):
         if self.game_active:
             self.projectile_group_invaders.update()
