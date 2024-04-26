@@ -47,6 +47,7 @@ class Game:
         for invader_list in collisions.values():
             for invader in invader_list:
                 invader.kill()
+                self.invader_group.remove(invader)
                 
     def check_projectile_hit_enemy(self, projectiles, enemy):
         for projectile in projectiles:
@@ -144,6 +145,11 @@ def load_background(DISPLAY_SURFACE):
                                                        size=(WINDOW_HEIGHT, WINDOW_HEIGHT)),
                          dest=(0, 0, WINDOW_HEIGHT, WINDOW_WIDTH))
 
+def display_win_screen():
+    font = pygame.font.Font(FONT_PATH, BASIC_FONT_SIZE)
+    win_text=font.render("YOU WIN !",True,(255,255,255))
+    DISPLAY_SURFACE.blit(win_text,(WINDOW_WIDTH // 2 - win_text.get_width() // 2, 200))
+    pygame.display.flip()
 
 def spaceship_collision(game: Game):
     value = pygame.sprite.spritecollide(sprite=game.spaceship, group=game.projectile_group_invaders, dokill=True)
@@ -153,7 +159,10 @@ def spaceship_collision(game: Game):
             print(game.spaceship.health)
             """ -- -- -- -- Place for an end of the game -- -- -- -- """
             game.game_active = False
-
+        if len(game.invader_group) == 0:
+            display_win_screen(DISPLAY_SURFACE)
+    return display_win_screen
+    
 def title_screen_animation(game: Game):
     invader_sprite_group = pygame.sprite.Group()
     for _ in range(10):
@@ -221,6 +230,8 @@ def main():
                      Projectile_group_spa=Group())
     title_screen_animation(game=main_game)
 
+    return_to_title = False
+
     while True:
         for event in pygame.event.get():
             if event.type == pygame.QUIT or (event.type == pygame.KEYUP and event.key == pygame.K_ESCAPE):
@@ -234,7 +245,26 @@ def main():
 
         # Update and draw projectiles
         main_game.update(DISPLAY_SURFACE=DISPLAY_SURFACE)  # Update projectile positions
+        
+        if not main_game.game_active:
+            display_win_screen(DISPLAY_SURFACE)
 
+            for event in pygame.event.get():
+                if event.type == pygame.KEYDOWN:
+                    return_to_title = True
+
+        if return_to_title:
+            # Reset game state and return to title screen
+            main_game = Game(Invader_group=invader_sprite_group, SpaceShip=spaceship, Projectile_group_inv=Group(),
+                             Projectile_group_spa=Group())
+            title_screen_animation(game=main_game)
+            return_to_title = False  # Reset the flag
+
+        if len(main_game.invader_group) == 0:
+            display_win_screen()
+            pygame.time.delay(5000)
+            return_to_title = True
+            
         pygame.display.update()
         FPS_CLOCK.tick(FPS)
 
