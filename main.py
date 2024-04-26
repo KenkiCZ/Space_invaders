@@ -48,6 +48,12 @@ class Game:
             for invader in invader_list:
                 invader.kill()
                 
+    def check_projectile_hit_enemy(self, projectiles, enemy):
+        for projectile in projectiles:
+            if pygame.sprite.collide_rect(projectile, enemy):
+                return True
+        return False           
+        
     def projectile_movement(self):
         if self.game_active:
             self.projectile_group_invaders.update()
