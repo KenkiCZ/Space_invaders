@@ -151,6 +151,22 @@ def display_win_screen():
     DISPLAY_SURFACE.blit(win_text,(WINDOW_WIDTH // 2 - win_text.get_width() // 2, 200))
     pygame.display.flip()
 
+def display_lose_screen():
+    font = pygame.font.Font(FONT_PATH, BASIC_FONT_SIZE)
+    lose_text=font.render("GAME OVER",True,(255,255,255))
+    DISPLAY_SURFACE.blit(lose_text,(WINDOW_WIDTH // 2 - lose_text.get_width() // 2, 200))
+    invader_sprite_group = pygame.sprite.Group()
+    for _ in range(30):
+        invader = Invader(random.randint(0, WINDOW_WIDTH), random.randint(0, WINDOW_HEIGHT))
+        invader_sprite_group.add(invader)
+
+    for invader in invader_sprite_group:
+        invader.rect.x += random.randint(-1, 1)
+        invader.rect.y += random.randint(-1, 1)
+        invader.rect.x = max(0, min(invader.rect.x, WINDOW_WIDTH - invader.rect.width))
+        invader.rect.y = max(0, min(invader.rect.y, WINDOW_HEIGHT - invader.rect.height))
+    pygame.display.flip()
+
 def spaceship_collision(game: Game):
     value = pygame.sprite.spritecollide(sprite=game.spaceship, group=game.projectile_group_invaders, dokill=True)
     if value:
@@ -193,10 +209,6 @@ def title_screen_animation(game: Game):
             invader.rect.x += 1
             if invader.rect.left > WINDOW_WIDTH:
                 invader.rect.right = 0
-            """invader.rect.x += random.randint(-1, 1)
-            invader.rect.y += random.randint(-1, 1)
-            invader.rect.x = max(0, min(invader.rect.x, WINDOW_WIDTH - invader.rect.width))
-            invader.rect.y = max(0, min(invader.rect.y, WINDOW_HEIGHT - invader.rect.height))"""
 
         DISPLAY_SURFACE.blit(highlighted_surface_title, (WINDOW_WIDTH // 2 - game_title.get_width() // 2, 200))
         DISPLAY_SURFACE.blit(game_title, (WINDOW_WIDTH // 2 - game_title.get_width() // 2, 200))
@@ -260,9 +272,14 @@ def main():
             title_screen_animation(game=main_game)
             return_to_title = False  # Reset the flag
 
-        if len(main_game.invader_group) == 0:
-            display_win_screen()
-            pygame.time.delay(5000)
+        if main_game.spaceship.health >=1:
+            if len(main_game.invader_group) == 0:
+                display_win_screen()
+                pygame.time.delay(3000)
+                return_to_title = True
+        if main_game.spaceship.health == 0:
+            display_lose_screen()
+            pygame.time.delay(3000)
             return_to_title = True
             
         pygame.display.update()
