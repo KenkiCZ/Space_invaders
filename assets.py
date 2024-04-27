@@ -1,7 +1,7 @@
 relative_path = "Images\Invader"
-INVADER_IMG = f"{relative_path}\invader_1.png"
-SPACESHIP_IMG = f"{relative_path}\spaceship1_1.png"
-BACKGROUND_IMG = f"{relative_path}\BG.png"
+INVADER_IMG = f"{relative_path}\invader.png"
+SPACESHIP_IMG = f"{relative_path}\spaceship2.png"
+BACKGROUND_IMG = f"{relative_path}\BG2.png"
 
 # SCREEN
 WINDOW_WIDTH = 612
