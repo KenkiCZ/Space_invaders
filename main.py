@@ -71,7 +71,7 @@ class SpaceShip(pygame.sprite.Sprite):  # Here we are inheriting from the pygame
         super().__init__()
         # The order of self.image: load image -> resize image -> rotate image
         self.image = pygame.transform.rotate(pygame.transform.scale(pygame.image.load(SPACESHIP_IMG).convert_alpha(), (
-        int(WINDOW_WIDTH * 0.15), int(WINDOW_WIDTH * 0.15))), 180.0)
+        int(WINDOW_WIDTH * 0.15), int(WINDOW_WIDTH * 0.15))), 0.0)
         # The order of self.rect: get rect from image -> set rect position
         self.rect = self.image.get_rect(midbottom=(WINDOW_WIDTH / 2, WINDOW_HEIGHT - 75))
         self.health = 3
