@@ -257,13 +257,6 @@ def main():
 
         # Update and draw projectiles
         main_game.update(DISPLAY_SURFACE=DISPLAY_SURFACE)  # Update projectile positions
-        
-        if not main_game.game_active:
-            display_win_screen()
-
-            for event in pygame.event.get():
-                if event.type == pygame.KEYDOWN:
-                    return_to_title = True
 
         if return_to_title:
             # Reset game state and return to title screen
