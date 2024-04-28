@@ -69,9 +69,8 @@ class Game:
 class SpaceShip(pygame.sprite.Sprite):  # Here we are inheriting from the pygame.sprite.Sprite class
     def __init__(self):
         super().__init__()
-        # The order of self.image: load image -> resize image -> rotate image
-        self.image = pygame.transform.rotate(pygame.transform.scale(pygame.image.load(SPACESHIP_IMG).convert_alpha(), (
-        int(WINDOW_WIDTH * 0.15), int(WINDOW_WIDTH * 0.15))), 0.0)
+        self.image = pygame.transform.scale(pygame.image.load(SPACESHIP_IMG).convert_alpha(), (
+        int(WINDOW_WIDTH * 0.15), int(WINDOW_WIDTH * 0.15)))
         # The order of self.rect: get rect from image -> set rect position
         self.rect = self.image.get_rect(midbottom=(WINDOW_WIDTH / 2, WINDOW_HEIGHT - 75))
         self.health = 3
@@ -83,7 +82,6 @@ class Invader(pygame.sprite.Sprite):
         super().__init__()
         self.x = x_pos
         self.y = y_pos
-        # Same order as SpaceShip
         self.image = pygame.transform.scale(pygame.image.load(INVADER_IMG).convert_alpha(),
                                             (int(WINDOW_WIDTH * 0.10), int(WINDOW_WIDTH * 0.10)))
         self.rect = self.image.get_rect(midbottom=(self.x, self.y))
@@ -92,6 +90,7 @@ class Invader(pygame.sprite.Sprite):
         if random.randint(0, 400) == 1 and 5 > len(game.projectile_group_invaders) and game.game_active:
             # Create a projectile
             shoot_projectile(game=game, position=(self.x, self.y), direction=1, speed=4)
+        
 
 
 # Class for Projectile
@@ -114,25 +113,24 @@ class Projectile(pygame.sprite.Sprite):
 
 class KeyPressed:
     def __init__(self):
-        self.event = None
+        self.type = None
         self.key = None
         self.is_held = False
 
 
-def handle_keypress(event, game: Game, continuous):
-    # TODO Make barrier for spaceship and add better continuous movement
+def handle_keypress(event, game: Game):
     if event.key == pygame.K_SPACE:
         if not game.projectile_group_spaceship.sprites():
             shoot_projectile(game, position=game.spaceship.rect.midtop, direction=-1)
-            return
+        return
 
-    game.key_pressed.event = event
+    game.key_pressed.type = event.type
     game.key_pressed.key = event.key
     game.key_pressed.is_held = True
-    if continuous:
-        change_distance = 2
-    else:
-        change_distance = 5
+    move_spaceship(game=game, change_distance=5)
+
+
+def move_spaceship(game: Game, change_distance):
     if game.key_pressed.key == pygame.K_RIGHT:
         game.spaceship.rect.x += change_distance
     elif game.key_pressed.key == pygame.K_LEFT:
@@ -255,6 +253,7 @@ def main():
     DISPLAY_SURFACE = pygame.display.set_mode(size=(WINDOW_WIDTH, WINDOW_HEIGHT))
     BASIC_FONT = pygame.font.Font('freesansbold.ttf', BASIC_FONT_SIZE)
     main_game = load_game()
+    title_screen_animation(game=main_game)
 
     while True:
         for event in pygame.event.get():
@@ -262,7 +261,7 @@ def main():
                 terminate()
 
             if event.type == pygame.KEYDOWN:
-                handle_keypress(event=event,game=main_game, continuous=False)
+                handle_keypress(event=event,game=main_game)
 
             if event.type == pygame.KEYUP and event.key == main_game.key_pressed.key:
                 main_game.key_pressed.is_held = False
@@ -270,13 +269,14 @@ def main():
 
         if main_game.game_active: 
             if main_game.key_pressed.is_held == True:
-                handle_keypress(main_game.key_pressed.event, game=main_game, continuous=True)
+                move_spaceship(game=main_game, change_distance=2)
             draw_game(main_game=main_game)
             main_game.update(DISPLAY_SURFACE=DISPLAY_SURFACE)  # Update projectile positions
 
         else:
-            main_game = load_game()
             title_screen_animation(game=main_game)
+            main_game = load_game()
+            
   
         pygame.display.update()
         FPS_CLOCK.tick(60)
