@@ -60,10 +60,7 @@ class Game:
 
         num_invaders = len(self.invader_group)
         if num_invaders == 0:
-            self.game_active = False
-            draw_game(self)
-            display_win_screen()
-            end_game_timer()
+            win(self)
 
     def spaceship_collision(self):
         value = pygame.sprite.spritecollide(self.spaceship, self.projectile_group_invaders, True)
@@ -75,13 +72,7 @@ class Game:
                 self.score = 0
 
             if self.spaceship.health == 0:
-                self.game_active = False
-                draw_game(self)
-                explosion_sound.play()
-                display_lose_screen()
-                pygame.mixer.music.stop()
-                game_over.play()
-                end_game_timer()        
+                lose(self)      
         
     def projectile_movement(self):
         if self.game_active:
@@ -140,6 +131,8 @@ class Invader(pygame.sprite.Sprite):
                 self.direction *= -1
                 self.go_down = False
                 self.change_in_y = 0
+            if self.rect.bottom+30 > WINDOW_HEIGHT:
+                lose(game=game)
 
 # Class for Projectile
 class Projectile(pygame.sprite.Sprite):
@@ -164,6 +157,22 @@ class KeyPressed:
         self.type = None
         self.key = None
         self.is_held = False
+
+
+def lose(game: Game):
+    game.game_active = False
+    draw_game(game)
+    explosion_sound.play()
+    display_lose_screen()
+    game_over.play()
+    end_game_timer()  
+
+
+def win(game: Game):
+    game.game_active = False
+    draw_game(game)
+    display_win_screen()
+    end_game_timer()
 
 
 def load_highscore():
@@ -244,6 +253,7 @@ def display_win_screen():
 
 
 def display_lose_screen():
+    pygame.mixer.music.stop()
     font = pygame.font.Font(FONT_PATH, BASIC_FONT_SIZE)
     lose_text=font.render("GAME OVER",True,(255,255,255))
     DISPLAY_SURFACE.blit(lose_text,(WINDOW_WIDTH // 2 - lose_text.get_width() // 2, 200))
