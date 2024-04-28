@@ -1,11 +1,10 @@
 import pygame, sys, random
-from pygame import mixer
 from pygame.locals import *
 from assets import *
 from pygame.sprite import Sprite, Group
 
 pygame.mixer.pre_init()
-mixer.init()
+pygame.mixer.init()
 
 FPS = 60
 pygame.display.set_caption("Space Invaders")
@@ -92,6 +91,9 @@ class Game:
             self.projectile_group_spaceship.update()
             self.projectile_group_spaceship.draw(DISPLAY_SURFACE)
 
+    def invader_movement(self):
+        pass
+
 
 # Class for SpaceShip
 class SpaceShip(pygame.sprite.Sprite):  # Here we are inheriting from the pygame.sprite.Sprite class
@@ -112,11 +114,32 @@ class Invader(pygame.sprite.Sprite):
                                             (int(WINDOW_WIDTH * 0.10), int(WINDOW_WIDTH * 0.10)))
         self.rect = self.image.get_rect(midbottom=(x_pos, y_pos))
 
+        self.change_in_y = 0
+        self.go_down = False
+        self.direction = -1
+        self.speed = 1
+
     def update(self, game: Game):
-        if random.randint(0, 400) == 1 and 5 > len(game.projectile_group_invaders) and game.game_active:
+        if random.randint(0, 35*int(len(game.invader_group))) == 1 and 5 > len(game.projectile_group_invaders) and game.game_active:
             # Create a projectile
             shoot_projectile(game=game, position=(self.rect.midbottom[0], self.rect.midbottom[1]), direction=1, speed=4)
             shoot_sound.play()
+        if game.game_active:
+            self.movement(game)
+
+    def movement(self, game: Game):
+        if not self.go_down:
+            self.rect.x += self.direction * self.speed
+            if self.rect.right > WINDOW_WIDTH or self.rect.left < 0:
+                for invader in game.invader_group:
+                    invader.go_down = True
+        else:
+            self.rect.y += 1
+            self.change_in_y += 1
+            if self.change_in_y == 10:
+                self.direction *= -1
+                self.go_down = False
+                self.change_in_y = 0
 
 # Class for Projectile
 class Projectile(pygame.sprite.Sprite):
@@ -185,6 +208,7 @@ def shoot_projectile(game: Game, position, direction, speed=10):
 
 def terminate():
     # End pygame and programme
+    pygame.mixer.quit()
     pygame.quit()
     sys.exit()
 
