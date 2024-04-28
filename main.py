@@ -82,9 +82,6 @@ class Game:
             self.projectile_group_spaceship.update()
             self.projectile_group_spaceship.draw(DISPLAY_SURFACE)
 
-    def invader_movement(self):
-        pass
-
 
 # Class for SpaceShip
 class SpaceShip(pygame.sprite.Sprite):  # Here we are inheriting from the pygame.sprite.Sprite class
