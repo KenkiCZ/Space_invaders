@@ -23,7 +23,7 @@ class Game:
 
     def update(self, DISPLAY_SURFACE):
         self.move_sprites()
-        self.projectile_invader_collision(display_surface=DISPLAY_SURFACE)
+        self.projectile_invader_collision()
         self.spaceship_collision()
 
     def move_sprites(self):
@@ -31,7 +31,7 @@ class Game:
             invader.update(self)
         self.projectile_movement()
         
-    def projectile_invader_collision(self, display_surface):
+    def projectile_invader_collision(self):
         collisions = pygame.sprite.groupcollide(self.projectile_group_spaceship, self.invader_group, True, True)
         for invader_list in collisions.values():
             for invader in invader_list:
@@ -135,6 +135,11 @@ def move_spaceship(game: Game, change_distance):
         game.spaceship.rect.x += change_distance
     elif game.key_pressed.key == pygame.K_LEFT:
         game.spaceship.rect.x -= change_distance
+    
+    if game.spaceship.rect.x < 0:
+        game.spaceship.rect.x = 0
+    if game.spaceship.rect.x > WINDOW_WIDTH - game.spaceship.rect.width:
+       game.spaceship.rect.x = WINDOW_WIDTH - game.spaceship.rect.width
 
 
 def shoot_projectile(game: Game, position, direction, speed=10):
@@ -157,6 +162,17 @@ def load_background(DISPLAY_SURFACE):
     DISPLAY_SURFACE.blit(source=pygame.transform.scale(pygame.image.load(BACKGROUND_IMG).convert_alpha(),
                                                        size=(WINDOW_HEIGHT, WINDOW_HEIGHT)),
                          dest=(0, 0, WINDOW_HEIGHT, WINDOW_WIDTH))
+
+
+HP_WIDTH = 30
+HP_HEIGHT = 10
+HP_BORDER_SIZE = 2
+def draw_health_bar(game: Game):
+    for hp in range(-1, game.spaceship.health-1):
+        hp_rect = ((WINDOW_WIDTH/2 +hp*(HP_WIDTH+15) - HP_WIDTH/2), WINDOW_HEIGHT-20, HP_WIDTH, HP_HEIGHT)
+        border_rect = ((WINDOW_WIDTH/2 +hp*(HP_WIDTH+15) - HP_WIDTH/2) - HP_BORDER_SIZE, WINDOW_HEIGHT-20 - HP_BORDER_SIZE, HP_WIDTH+HP_BORDER_SIZE*2, HP_HEIGHT+HP_BORDER_SIZE)
+        pygame.draw.rect(DISPLAY_SURFACE, (0, 0, 0), border_rect)
+        pygame.draw.rect(DISPLAY_SURFACE, (0, 255, 0), hp_rect)
 
 
 def display_win_screen():
@@ -236,6 +252,7 @@ def draw_game(main_game: Game):
     load_background(DISPLAY_SURFACE=DISPLAY_SURFACE)
     DISPLAY_SURFACE.blit(main_game.spaceship.image, main_game.spaceship.rect)
     main_game.invader_group.draw(DISPLAY_SURFACE)
+    draw_health_bar(main_game)
 
 
 def load_game():
