@@ -77,7 +77,6 @@ class Game:
 
 
 # Class for SpaceShip
-
 class SpaceShip(pygame.sprite.Sprite):  # Here we are inheriting from the pygame.sprite.Sprite class
     def __init__(self):
         super().__init__()
