@@ -12,4 +12,10 @@ FONT_PATH = "Fonts\Pixeled.ttf"
 
 
 # AUDIO
-BACKGROUND_MUSIC = "Audio\background_music.mp3"
+INTRO_MUSIC = "Audio/space-invaders-classic.mp3"
+BACKGROUND_MUSIC = "Audio/space-fantasy2.mp3"
+INVADER_SHOOT = "Audio/shoot.wav"
+EXPLOSION = "Audio/explosion.wav"
+HEALTH_DOWN = "Audio/minushealth.wav"
+YOU_WIN = "Audio/you_win.mp3"
+GAME_OVER = "Audio/game_over.mp3"
