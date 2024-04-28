@@ -80,6 +80,7 @@ class Game:
                 draw_game(self)
                 explosion_sound.play()
                 display_lose_screen()
+                pygame.mixer.music.stop()
                 game_over.play()
                 end_game_timer()        
         
@@ -210,6 +211,7 @@ def draw_score(score, text="Score: "):
 
 
 def display_win_screen():
+    pygame.mixer.music.stop()
     you_win.play()
     font = pygame.font.Font(FONT_PATH, BASIC_FONT_SIZE)
     win_text=font.render("YOU WIN !",True,(255,255,255))
