@@ -1,7 +1,11 @@
 import pygame, sys, random
+from pygame import mixer
 from pygame.locals import *
 from assets import *
 from pygame.sprite import Sprite, Group
+
+pygame.mixer.pre_init()
+mixer.init()
 
 FPS = 60
 pygame.display.set_caption("Space Invaders")
@@ -15,6 +19,14 @@ HP_HEIGHT = 10
 HP_BORDER_SIZE = 2
 SCORE_FONT_SIZE = 15
 
+#load sounds
+shoot_sound = pygame.mixer.Sound(INVADER_SHOOT)
+explosion_sound = pygame.mixer.Sound(EXPLOSION)
+minus_hp_sound = pygame.mixer.Sound(HEALTH_DOWN)
+you_win = pygame.mixer.Sound(YOU_WIN)
+game_over = pygame.mixer.Sound(GAME_OVER)
+bg_music = pygame.mixer.music.load(BACKGROUND_MUSIC)
+title_music = pygame.mixer.Sound(INTRO_MUSIC)
 
 # Class for Game
 class Game:
@@ -45,6 +57,7 @@ class Game:
                 invader.kill()
                 self.invader_group.remove(invader)
                 self.score += 100
+                explosion_sound.play()
 
         num_invaders = len(self.invader_group)
         if num_invaders == 0:
@@ -56,6 +69,7 @@ class Game:
     def spaceship_collision(self):
         value = pygame.sprite.spritecollide(self.spaceship, self.projectile_group_invaders, True)
         if value:
+            minus_hp_sound.play()
             self.spaceship.health -= 1
             self.score -= 50
             if self.score < 0:
@@ -64,7 +78,9 @@ class Game:
             if self.spaceship.health == 0:
                 self.game_active = False
                 draw_game(self)
+                explosion_sound.play()
                 display_lose_screen()
+                game_over.play()
                 end_game_timer()        
         
     def projectile_movement(self):
@@ -99,7 +115,7 @@ class Invader(pygame.sprite.Sprite):
         if random.randint(0, 400) == 1 and 5 > len(game.projectile_group_invaders) and game.game_active:
             # Create a projectile
             shoot_projectile(game=game, position=(self.rect.midbottom[0], self.rect.midbottom[1]), direction=1, speed=4)
-        
+            shoot_sound.play()
 
 # Class for Projectile
 class Projectile(pygame.sprite.Sprite):
@@ -135,6 +151,7 @@ def handle_keypress(event, game: Game):
     if event.key == pygame.K_SPACE:
         if not game.projectile_group_spaceship.sprites():
             shoot_projectile(game, position=game.spaceship.rect.midtop, direction=-1)
+            shoot_sound.play()
         return
 
     if event.key == pygame.K_RIGHT or pygame.K_LEFT == event.key:
@@ -193,6 +210,7 @@ def draw_score(score, text="Score: "):
 
 
 def display_win_screen():
+    you_win.play()
     font = pygame.font.Font(FONT_PATH, BASIC_FONT_SIZE)
     win_text=font.render("YOU WIN !",True,(255,255,255))
     DISPLAY_SURFACE.blit(win_text,(WINDOW_WIDTH // 2 - win_text.get_width() // 2, 200))
@@ -231,13 +249,17 @@ def title_screen_animation(game: Game):
     highlighted_surface_start = pygame.Surface((start_text.get_width(), start_text.get_height()))
     highlighted_surface_start.fill((0, 0, 0))
 
+    title_music.play()
+
     while True:
         for event in pygame.event.get():
             if event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE:
                 game.game_active = True
+                title_music.stop()
                 return
             if event.type == pygame.QUIT:
                 terminate()
+        pygame.mixer.music.play()
         load_background(DISPLAY_SURFACE=DISPLAY_SURFACE)
         draw_score(score=load_highscore(), text="HIGHSCORE: ")
         invader_sprite_group.update(game)
