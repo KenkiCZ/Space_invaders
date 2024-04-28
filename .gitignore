@@ -1,4 +1,4 @@
-/random_stuff
-/.vscode
+__pycache__/
+random_stuff/
 Max_score.txt
 save.py

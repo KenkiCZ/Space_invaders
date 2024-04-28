@@ -91,18 +91,15 @@ class SpaceShip(pygame.sprite.Sprite):  # Here we are inheriting from the pygame
 class Invader(pygame.sprite.Sprite):
     def __init__(self, x_pos, y_pos):
         super().__init__()
-        self.x = x_pos
-        self.y = y_pos
         self.image = pygame.transform.scale(pygame.image.load(INVADER_IMG).convert_alpha(),
                                             (int(WINDOW_WIDTH * 0.10), int(WINDOW_WIDTH * 0.10)))
-        self.rect = self.image.get_rect(midbottom=(self.x, self.y))
+        self.rect = self.image.get_rect(midbottom=(x_pos, y_pos))
 
     def update(self, game: Game):
         if random.randint(0, 400) == 1 and 5 > len(game.projectile_group_invaders) and game.game_active:
             # Create a projectile
             shoot_projectile(game=game, position=(self.x, self.y), direction=1, speed=4)
         
-
 
 # Class for Projectile
 class Projectile(pygame.sprite.Sprite):
