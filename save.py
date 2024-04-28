@@ -65,13 +65,12 @@ class Game:
 
 
 # Class for SpaceShip
-
 class SpaceShip(pygame.sprite.Sprite):  # Here we are inheriting from the pygame.sprite.Sprite class
     def __init__(self):
         super().__init__()
         # The order of self.image: load image -> resize image -> rotate image
         self.image = pygame.transform.rotate(pygame.transform.scale(pygame.image.load(SPACESHIP_IMG).convert_alpha(), (
-        int(WINDOW_WIDTH * 0.15), int(WINDOW_WIDTH * 0.15))), 0.0)
+        int(WINDOW_WIDTH * 0.15), int(WINDOW_WIDTH * 0.15))), 180.0)
         # The order of self.rect: get rect from image -> set rect position
         self.rect = self.image.get_rect(midbottom=(WINDOW_WIDTH / 2, WINDOW_HEIGHT - 75))
         self.health = 3
@@ -149,7 +148,6 @@ def shoot_projectile(game: Game, position, direction, speed=10):
 
 
 def terminate():
-    # End pygame and programme
     pygame.quit()
     sys.exit()
 
@@ -183,8 +181,8 @@ def display_lose_screen():
         invader.rect.x = max(0, min(invader.rect.x, WINDOW_WIDTH - invader.rect.width))
         invader.rect.y = max(0, min(invader.rect.y, WINDOW_HEIGHT - invader.rect.height))
     pygame.display.flip()
+    
 
-  
 def title_screen_animation(game: Game):
     invader_sprite_group = pygame.sprite.Group()
     for _ in range(10):
@@ -247,6 +245,7 @@ def load_game():
         invader_sprite_group.add(invader)
     return Game(Invader_group=invader_sprite_group, SpaceShip=SpaceShip(), Projectile_group_inv=Group(),
                      Projectile_group_spa=Group(), key_pressed= KeyPressed())
+
 
 def main():
     global FPS_CLOCK, DISPLAY_SURFACE, BASIC_FONT
