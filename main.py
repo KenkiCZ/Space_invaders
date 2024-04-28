@@ -98,7 +98,7 @@ class Invader(pygame.sprite.Sprite):
     def update(self, game: Game):
         if random.randint(0, 400) == 1 and 5 > len(game.projectile_group_invaders) and game.game_active:
             # Create a projectile
-            shoot_projectile(game=game, position=(self.x, self.y), direction=1, speed=4)
+            shoot_projectile(game=game, position=(self.rect.midbottom[0], self.rect.midbottom[1]), direction=1, speed=4)
         
 
 # Class for Projectile
