@@ -10,6 +10,12 @@ DISPLAY_SURFACE = None
 BASIC_FONT = None
 BASIC_FONT_SIZE = 30
 
+HP_WIDTH = 30
+HP_HEIGHT = 10
+HP_BORDER_SIZE = 2
+SCORE_FONT_SIZE = 15
+
+
 # Class for Game
 class Game:
     def __init__(self, Invader_group, SpaceShip, Projectile_group_inv, Projectile_group_spa, key_pressed):
@@ -20,6 +26,7 @@ class Game:
         self.spaceship = SpaceShip
         self.key_pressed = key_pressed
         self.game_active = False
+        self.score = 0
 
     def update(self, DISPLAY_SURFACE):
         self.move_sprites()
@@ -37,6 +44,7 @@ class Game:
             for invader in invader_list:
                 invader.kill()
                 self.invader_group.remove(invader)
+                self.score += 100
 
         num_invaders = len(self.invader_group)
         if num_invaders == 0:
@@ -49,6 +57,10 @@ class Game:
         value = pygame.sprite.spritecollide(self.spaceship, self.projectile_group_invaders, True)
         if value:
             self.spaceship.health -= 1
+            self.score -= 50
+            if self.score < 0:
+                self.score = 0
+
             if self.spaceship.health == 0:
                 self.game_active = False
                 draw_game(self)
@@ -118,16 +130,22 @@ class KeyPressed:
         self.is_held = False
 
 
+def load_highscore():
+    with open(file="Max_score.txt", mode="r", encoding="UTF-8") as f:
+        return f.read()
+
+
 def handle_keypress(event, game: Game):
     if event.key == pygame.K_SPACE:
         if not game.projectile_group_spaceship.sprites():
             shoot_projectile(game, position=game.spaceship.rect.midtop, direction=-1)
         return
 
-    game.key_pressed.type = event.type
-    game.key_pressed.key = event.key
-    game.key_pressed.is_held = True
-    move_spaceship(game=game, change_distance=5)
+    if event.key == pygame.K_RIGHT or pygame.K_LEFT == event.key:
+        game.key_pressed.type = event.type
+        game.key_pressed.key = event.key
+        game.key_pressed.is_held = True
+        move_spaceship(game=game, change_distance=5)
 
 
 def move_spaceship(game: Game, change_distance):
@@ -164,15 +182,18 @@ def load_background(DISPLAY_SURFACE):
                          dest=(0, 0, WINDOW_HEIGHT, WINDOW_WIDTH))
 
 
-HP_WIDTH = 30
-HP_HEIGHT = 10
-HP_BORDER_SIZE = 2
 def draw_health_bar(game: Game):
     for hp in range(-1, game.spaceship.health-1):
         hp_rect = ((WINDOW_WIDTH/2 +hp*(HP_WIDTH+15) - HP_WIDTH/2), WINDOW_HEIGHT-20, HP_WIDTH, HP_HEIGHT)
-        border_rect = ((WINDOW_WIDTH/2 +hp*(HP_WIDTH+15) - HP_WIDTH/2) - HP_BORDER_SIZE, WINDOW_HEIGHT-20 - HP_BORDER_SIZE, HP_WIDTH+HP_BORDER_SIZE*2, HP_HEIGHT+HP_BORDER_SIZE)
+        border_rect = ((WINDOW_WIDTH/2 +hp*(HP_WIDTH+15) - HP_WIDTH/2) - HP_BORDER_SIZE, WINDOW_HEIGHT-20 - HP_BORDER_SIZE, HP_WIDTH+HP_BORDER_SIZE*2, HP_HEIGHT+2*HP_BORDER_SIZE)
         pygame.draw.rect(DISPLAY_SURFACE, (0, 0, 0), border_rect)
         pygame.draw.rect(DISPLAY_SURFACE, (0, 255, 0), hp_rect)
+
+
+def draw_score(score, text="Score: "):
+    font = pygame.font.Font(FONT_PATH, SCORE_FONT_SIZE)
+    score_text = font.render(text + str(score), True, (0, 0, 0))
+    DISPLAY_SURFACE.blit(score_text, (WINDOW_WIDTH - score_text.get_width() - 10, WINDOW_HEIGHT-score_text.get_height()))
 
 
 def display_win_screen():
@@ -222,6 +243,7 @@ def title_screen_animation(game: Game):
             if event.type == pygame.QUIT:
                 terminate()
         load_background(DISPLAY_SURFACE=DISPLAY_SURFACE)
+        draw_score(score=load_highscore(), text="HIGHSCORE: ")
         invader_sprite_group.update(game)
         invader_sprite_group.draw(DISPLAY_SURFACE)
 
@@ -253,6 +275,7 @@ def draw_game(main_game: Game):
     DISPLAY_SURFACE.blit(main_game.spaceship.image, main_game.spaceship.rect)
     main_game.invader_group.draw(DISPLAY_SURFACE)
     draw_health_bar(main_game)
+    draw_score(score=main_game.score)
 
 
 def load_game():
@@ -291,8 +314,11 @@ def main():
             main_game.update(DISPLAY_SURFACE=DISPLAY_SURFACE)  # Update projectile positions
 
         else:
-            title_screen_animation(game=main_game)
+            if int(load_highscore()) < main_game.score:
+                with open(file="Max_score.txt", mode="w", encoding="UTF-8") as f:
+                    f.write(str(main_game.score))
             main_game = load_game()
+            title_screen_animation(game=main_game)
             
   
         pygame.display.update()
