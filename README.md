@@ -1,4 +1,4 @@
-Manifest vesmirných útočníků
+Manifest vesmírných útočníků
 
 License
 Copyright (c) 2024 @KenkiCZ @lind584 @pestodasa @cryl1ss
